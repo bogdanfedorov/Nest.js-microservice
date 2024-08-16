@@ -9,11 +9,7 @@ export class UserController {
   async createUser(
     @Body() body: { username: string; email: string; password: string },
   ) {
-    return this.userService.createUser(
-      body.username,
-      body.email,
-      body.password,
-    );
+    return this.userService.createUser(body.username, body.email);
   }
 
   @Get()
