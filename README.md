@@ -56,6 +56,28 @@ The "To-Do List" application with a microservice architecture will be a task man
    - **Database:** PostgreSQL or MongoDB for storing projects and their attributes.
    - **Features:** Supports Agile methodologies like Kanban and Scrum.
 
+### Interaction of services
+
+- **Auth Service -> API Gateway :** "JWT validation request"
+- **API Gateway -> Auth Service :** "User authentication and authorization"
+- **API Gateway -> Task Management Service :** "Create, update, delete, or fetch tasks"
+- **Task Management Service -> User Management Service :** "Fetch user details (task owner or assignee)"
+- **Task Management Service -> Notification Service :** "Task created/updated/deleted event"
+- **Notification Service -> User Management Service :** "Fetch user contact details (for notifications)"
+- **Task Management Service -> Analytics Service :** "Log task creation, update, completion events"
+- **Analytics Service -> Task Management Service :** "Request detailed task data for analysis"
+- **API Gateway -> Notification Service :** "Send notification preference update request"
+- **User Management Service -> Notification Service :** "Send user notification preference update event"
+- **User Management Service -> Analytics Service :** "Log user activity"
+- **API Gateway -> Search Service :** "Search request for tasks, users, or notifications"
+- **Search Service -> Task Management Service :** "Fetch task data for search indexing"
+- **Search Service -> User Management Service :** "Fetch user data for search indexing"
+- **Task Management Service -> Project Management Service :** "Assign task to a project"
+- **Project Management Service -> Task Management Service :** "Fetch tasks related to a project"
+- **API Gateway -> Project Management Service :** "Create, update, delete, or fetch projects"
+- **Project Management Service -> User Management Service :** "Fetch project owner or member details"
+- **Analytics Service -> Project Management Service :** "Request project data for analysis"
+
 ### Microservice Interaction
 
 - **REST API:** Used for communication between microservices, for example, the Task Management Service may request data from the User Management Service about the task owner.
