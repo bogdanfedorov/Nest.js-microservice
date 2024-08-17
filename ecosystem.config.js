@@ -1,65 +1,33 @@
-const MONGO_DB_URL = "mongodb://localhost:27017/";
-const NODE_ENV = "development";
-const developmentEnv = {
-  MONGO_DB_URL,
-  NODE_ENV,
-};
+const localhost = "localhost";
 
-// Script for npm
-// npm --prefix ./example run start
+const app = (folder, env) => ({
+  namespace: "NEST_TODO_DEV",
+  name: folder,
+  script: `yarn --cwd ./${folder} start:dev`, // OR `npm --prefix ./${folder} run start`
+  env: {
+    MONGO_DB_URL: "mongodb://localhost:27017/",
+    NODE_ENV: "development",
+    ...env,
+  },
+});
 
 module.exports = {
   apps: [
-    {
-      name: "api-geteway",
-      script: "yarn --cwd ./api-gateway start:dev",
-      env: {
-        ...developmentEnv,
-        PORT: "3000",
-        AUTH_SERVICE_URL: "http://localhost:3001",
-      },
-    },
-    {
-      name: "auth-service",
-      script: "yarn --cwd ./auth-service start:dev",
-      env: {
-        ...developmentEnv,
-        PORT: "3001",
-        JWT_SECRET: "mo6bfdc3c44facbb2edfc93504f44a70360dc88a8b8a1fb08b7fa087",
-        JWT_EXPIRES_IN: "1h",
-      },
-    },
+    app("api-geteway", {
+      PORT: "3000",
+      AUTH_SERVICE_HOST: localhost,
+      AUTH_SERVICE_PORT: "3001",
+    }),
+    app("auth-service", {
+      PORT: "3001",
+      JWT_SECRET: "my super puper seccret key",
+      JWT_EXPIRES_IN: "1h",
+    }),
+    app("task-management-service", {
+      PORT: "3002",
+    }),
+    app("user-management-service", {
+      PORT: "3003",
+    }),
   ],
 };
-
-/*
- 
-    {
-      name: "auth-service",
-      script: "./app.js",
-      env: {
-        PORT: "3001",
-        JWT_SECRET: "mo6bfdc3c44facbb2edfc93504f44a70360dc88a8b8a1fb08b7fa087",
-        JWT_EXPIRES_IN: "1h",
-        MONGO_DB_URL,
-      },
-    },
-    {
-      name: "task-management-service",
-      env: {
-        PORT: "3002",
-        MONGO_DB_URL,
-      },
-    },
-    {
-      name: "user-management-service",
-      env: {
-        PORT: "3003",
-        MONGO_DB_URL,
-      },
-    },
-
-
-
-
- * */
