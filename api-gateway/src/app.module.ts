@@ -11,11 +11,11 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
     {
       provide: Services.Auth,
       useFactory: (configService: ConfigService) => {
-        const authServiceUrl = configService.get('AUTH_SERVICE_URL');
         return ClientProxyFactory.create({
           transport: Transport.TCP,
           options: {
-            port: 3001,
+            host: configService.get('AUTH_SERVICE_HOST'),
+            port: Number(configService.get('AUTH_SERVICE_PORT')),
           },
         });
       },
