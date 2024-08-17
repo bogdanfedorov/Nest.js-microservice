@@ -6,14 +6,19 @@ import {
   UserCredentials,
   UserCredentialsDocument,
 } from './schemas/userCredentials.schema';
-import { RegisterDto, LoginDto } from './dto/auth.dto';
+import {
+  RegisterDto,
+  LoginDto,
+  TokenPayload,
+  TokenVereficationStatus,
+} from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(UserCredentials.name)
-    private userModel: Model<UserCredentialsDocument>,
-    private jwtService: JwtService,
+    private readonly userModel: Model<UserCredentialsDocument>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async register(registerDto: RegisterDto): Promise<UserCredentials> {
@@ -30,7 +35,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { username: user.username, sub: user._id, role: user.role };
+    const payload = {
+      username: user.username,
+      sub: user._id,
+      role: user.role,
+    } as TokenPayload;
     const accessToken = this.jwtService.sign(payload);
 
     return { accessToken };
@@ -38,5 +47,20 @@ export class AuthService {
 
   async validateUser(userId: string): Promise<UserCredentials> {
     return this.userModel.findById(userId).exec();
+  }
+
+  async validateToken(token: string): Promise<TokenVereficationStatus> {
+    let status = TokenVereficationStatus.Rejected;
+
+    let payload: TokenPayload;
+    try {
+      payload = await this.jwtService.verifyAsync<TokenPayload>(token);
+    } catch {}
+
+    if (payload) {
+      status = TokenVereficationStatus.Confirmed;
+    }
+
+    return status;
   }
 }
