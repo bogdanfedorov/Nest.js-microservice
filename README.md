@@ -2,6 +2,8 @@ The "To-Do List" application with a microservice architecture will be a task man
 
 ### Architecture
 
+![Microservices architecture schema](./spec/microservices.drawio.png)
+
 1. **Authentication and Authorization Microservice (Auth Service)**
 
    - **Functionality:** Provides user registration, login, and access management.
