@@ -1,17 +1,19 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { JwtService } from '@nestjs/jwt';
+import {
+  DecodeTokenDto,
+  DecodeTokenResDto,
+  LoginDto,
+  RegisterDto,
+  TokenPayload,
+} from './dto/auth.dto';
 import {
   UserCredentials,
   UserCredentialsDocument,
 } from './schemas/userCredentials.schema';
-import {
-  RegisterDto,
-  LoginDto,
-  TokenPayload,
-  TokenVereficationStatus,
-} from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +21,7 @@ export class AuthService {
     @InjectModel(UserCredentials.name)
     private readonly userModel: Model<UserCredentialsDocument>,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async register(registerDto: RegisterDto): Promise<UserCredentials> {
@@ -37,6 +40,7 @@ export class AuthService {
 
     const payload = {
       username: user.username,
+      userId: user._id,
       sub: user._id,
       role: user.role,
     } as TokenPayload;
@@ -49,18 +53,31 @@ export class AuthService {
     return this.userModel.findById(userId).exec();
   }
 
-  async validateToken(token: string): Promise<TokenVereficationStatus> {
-    let status = TokenVereficationStatus.Rejected;
-
+  async decodeToken(
+    validateAccess: DecodeTokenDto,
+  ): Promise<DecodeTokenResDto> {
     let payload: TokenPayload;
     try {
-      payload = await this.jwtService.verifyAsync<TokenPayload>(token);
-    } catch {}
+      payload = await this.jwtService.verifyAsync<TokenPayload>(
+        validateAccess.token,
+        {
+          secret: this.configService.get<string>('JWT_SECRET'),
+        },
+      );
 
-    if (payload) {
-      status = TokenVereficationStatus.Confirmed;
+      delete payload['iat'];
+      delete payload['exp'];
+      delete payload['sub'];
+    } catch (e) {
+      return {
+        data: null,
+        error: e.message,
+      };
     }
 
-    return status;
+    return {
+      data: payload,
+      error: null,
+    };
   }
 }

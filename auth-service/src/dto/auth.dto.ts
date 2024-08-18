@@ -1,3 +1,5 @@
+import { ProtoResDto } from './proto.dto';
+
 export class RegisterDto {
   username: string;
   password: string;
@@ -8,19 +10,20 @@ export class LoginDto {
   password: string;
 }
 
+export class DecodeTokenDto {
+  token: string;
+}
+
 export class TokenPayload {
   username: string;
-  sub: string;
+  userId: string;
   role: string;
 }
 
-export enum TokenVereficationStatus {
-  Confirmed,
-  Rejected,
-}
+export class DecodeTokenResDto extends ProtoResDto<TokenPayload> {}
 
 export enum AuthCommands {
   Register,
   Login,
-  Verefication,
+  DecodeToken,
 }
