@@ -13,7 +13,7 @@ const app = (folder, env) => ({
 
 module.exports = {
   apps: [
-    app("api-geteway", {
+    app("api-gateway", {
       PORT: "3000",
       AUTH_SERVICE_HOST: localhost,
       AUTH_SERVICE_PORT: "3001",
