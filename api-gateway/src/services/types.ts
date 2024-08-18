@@ -1,3 +1,5 @@
 export enum Services {
-  Auth = 'AuthService',
+  Auth = 'AUTH_SERVICE',
+  Task = 'TASK_MANAGEMENT_SERVICE',
+  User = 'USER_MANAGEMENT_SERVICE',
 }

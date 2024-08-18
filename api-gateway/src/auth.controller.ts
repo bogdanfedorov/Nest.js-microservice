@@ -1,6 +1,8 @@
-import { Body, Controller, Headers, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Req } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { Request } from 'express';
 import { AuthCommands, LoginDto, RegisterDto } from './dto/auth.dto';
+import { Authorization } from './guards';
 import { Services } from './services/types';
 
 @Controller('auth')
@@ -22,11 +24,9 @@ export class AuthController {
     return this.authServiceClient.send({ cmd: AuthCommands.Login }, loginDto);
   }
 
-  @Post('verefication')
-  async getMe(@Headers('Authorization') token: string) {
-    return this.authServiceClient.send(
-      { cmd: AuthCommands.Verefication },
-      token,
-    );
+  @Post('me')
+  @Authorization(true)
+  async getMe(@Req() req: Request & { user: any }) {
+    return req.user;
   }
 }
