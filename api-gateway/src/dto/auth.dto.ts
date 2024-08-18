@@ -17,8 +17,9 @@ export class DecodeTokenDto {
 export class TokenPayload {
   username: string;
   userId: string;
-  sub: string;
   role: string;
+  iat: number;
+  exp: number;
 }
 
 export class DecodeTokenResDto extends ProtoResDto<TokenPayload> {}

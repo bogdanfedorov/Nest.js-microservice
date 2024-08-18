@@ -12,7 +12,9 @@ import {
   AuthCommands,
   DecodeTokenDto,
   DecodeTokenResDto,
+  TokenPayload,
 } from 'src/dto/auth.dto';
+import { RedisService } from 'src/services/redis.service';
 import { Services } from 'src/services/types';
 import { MetadataKeys } from '../type';
 
@@ -21,6 +23,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     @Inject(Services.Auth) private readonly authServiceClient: ClientProxy,
+    @Inject() private readonly redisService: RedisService,
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -46,26 +49,39 @@ export class AuthGuard implements CanActivate {
       );
     }
 
-    const validateAccessDto: DecodeTokenDto = {
-      token: token,
-    };
-    const userTokenInfo: DecodeTokenResDto = await firstValueFrom(
-      this.authServiceClient.send(
-        { cmd: AuthCommands.DecodeToken },
-        validateAccessDto,
-      ),
-    );
+    let payload: TokenPayload;
+    try {
+      payload = await this.redisService.isTokenValid(token);
+    } catch {}
 
-    if (userTokenInfo.error !== null) {
-      throw new HttpException(
-        {
-          message: userTokenInfo.error,
-        },
-        401,
+    if (payload) {
+      console.log('Token found in Redis');
+    } else {
+      console.log('Token not found in Redis, checking with Auth service');
+      const validateAccessDto: DecodeTokenDto = {
+        token: token,
+      };
+      const userTokenInfo: DecodeTokenResDto = await firstValueFrom(
+        this.authServiceClient.send(
+          { cmd: AuthCommands.DecodeToken },
+          validateAccessDto,
+        ),
       );
+
+      if (userTokenInfo.error !== null) {
+        throw new HttpException(
+          {
+            message: userTokenInfo.error,
+          },
+          401,
+        );
+      }
+
+      payload = userTokenInfo.data;
+      await this.redisService.cacheToken(token, payload);
     }
 
-    request.user = userTokenInfo.data;
+    request.user = payload;
 
     return true;
   }

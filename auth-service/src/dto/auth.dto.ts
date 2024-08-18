@@ -18,6 +18,8 @@ export class TokenPayload {
   username: string;
   userId: string;
   role: string;
+  iat?: number;
+  exp?: number;
 }
 
 export class DecodeTokenResDto extends ProtoResDto<TokenPayload> {}

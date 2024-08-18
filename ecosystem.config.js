@@ -17,6 +17,7 @@ module.exports = {
       PORT: "3000",
       AUTH_SERVICE_HOST: localhost,
       AUTH_SERVICE_PORT: "3001",
+      REDIS_URL: "redis://localhost:6379",
     }),
     app("auth-service", {
       PORT: "3001",

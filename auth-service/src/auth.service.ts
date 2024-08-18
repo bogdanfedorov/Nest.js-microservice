@@ -65,8 +65,6 @@ export class AuthService {
         },
       );
 
-      delete payload['iat'];
-      delete payload['exp'];
       delete payload['sub'];
     } catch (e) {
       return {
